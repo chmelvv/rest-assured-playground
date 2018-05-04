@@ -1,22 +1,15 @@
-package com.blogspot.chmelvv;
+package com.blogspot.chmelvv.University;
 
-import io.restassured.RestAssured;
+import com.blogspot.chmelvv.BaseTest;
+import com.blogspot.chmelvv.Student;
 import io.restassured.http.ContentType;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
 import static io.restassured.RestAssured.given;
 
-public class StudentPostTest {
-
-	@BeforeClass
-	public static void init(){
-		RestAssured.baseURI = "http://localhost";
-		RestAssured.port = 8080;
-		RestAssured.basePath = "/student";
-	}
+public class StudentPostTest extends BaseTest {
 
 	@Test
 	public void createNewStudent(){
@@ -32,12 +25,16 @@ public class StudentPostTest {
 		student.setCourses(courses);
 
 		given()
+				.log() //log request
+				.ifValidationFails()
 				.contentType(ContentType.JSON)
 				.when()
 				.body(student)
 				.post()
 				.then()
-				.statusCode(201);
+				.log() // log response
+				.ifValidationFails()
+				.statusCode(200);
 
 	}
 }
