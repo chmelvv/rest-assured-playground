@@ -5,7 +5,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static io.restassured.RestAssured.given;
@@ -25,6 +24,11 @@ public class SearchAPITest {
 		RestAssured.basePath = "/v1";
 	}
 
+	/**
+	 * - JSONPath <-> GPath </->http://groovy-lang.org/processing-xml.html#_gpath
+	 * - Also see Groovy Collection functions fo filter results - http://docs.groovy-lang.org/latest/html/groovy-jdk/java/util/Collection.html
+	 *
+	 */
 	@Test
 	public void usingJSONPathExmaple(){
 
@@ -92,6 +96,35 @@ public class SearchAPITest {
 				.path("items.findAll{it.name=='IPHONE 6 16GB Gold Unlocked Refurbished'}");
 
 		System.out.println("specificProductName = " + specificProductName);
-	}
 
+		ArrayList<Double> salePrice = given()
+				.queryParam("query", "iphone")
+				.queryParam("apiKey", APIKEY)
+				.queryParam("format", "json")
+				.when()
+				.get("/search")
+				.then().extract()
+				.path("items.findAll{it.name=='IPHONE 6 16GB Gold Unlocked Refurbished'}.salePrice");
+		System.out.println("salePrice = " + salePrice);
+
+		ArrayList<String> lessThen150 = given()
+				.queryParam("query", "iphone")
+				.queryParam("apiKey", APIKEY)
+				.queryParam("format", "json")
+				.when()
+				.get("/search")
+				.then().extract()
+				.path("items.findAll{it.salePrice<150}.name");
+		System.out.println("lessThen150 = " + String.join("\n\t",lessThen150));
+
+		ArrayList<String> chooseBlack = given()
+				.queryParam("query", "iphone")
+				.queryParam("apiKey", APIKEY)
+				.queryParam("format", "json")
+				.when()
+				.get("/search")
+				.then().extract()
+				.path("items.findAll{it.name==~/.*Black.*/}.name");
+		System.out.println("chooseBlack = " + String.join("\n\t",chooseBlack));
+	}
 }
